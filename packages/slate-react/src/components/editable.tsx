@@ -839,6 +839,10 @@ export const Editable = (props: EditableProps) => {
                   event.data
                 ) {
                   Editor.insertText(editor, event.data)
+                } else if (IS_QQBROWSER && IS_CHROME && event.data) {
+                  // CHANGED! for chromium core browser, insert whenever a composition
+                  // ends since it will already have been committed to the DOM.
+                  Editor.insertText(editor, event.data)
                 }
 
                 if (editor.selection && Range.isCollapsed(editor.selection)) {
@@ -885,20 +889,20 @@ export const Editable = (props: EditableProps) => {
                     Editor.deleteFragment(editor)
                     return
                   }
-                  const inline = Editor.above(editor, {
-                    match: n => Editor.isInline(editor, n),
-                    mode: 'highest',
-                  })
-                  if (inline) {
-                    const [, inlinePath] = inline
-                    if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
-                      const point = Editor.after(editor, inlinePath)!
-                      Transforms.setSelection(editor, {
-                        anchor: point,
-                        focus: point,
-                      })
-                    }
-                  }
+                  // const inline = Editor.above(editor, {
+                  //   match: n => Editor.isInline(editor, n),
+                  //   mode: 'highest',
+                  // })
+                  // if (inline) {
+                  //   const [, inlinePath] = inline
+                  //   if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+                  //     const point = Editor.after(editor, inlinePath)!
+                  //     Transforms.setSelection(editor, {
+                  //       anchor: point,
+                  //       focus: point,
+                  //     })
+                  //   }
+                  // }
                   // insert new node in advance to ensure composition text will insert
                   // along with final input text
                   // add Unicode BOM prefix to avoid normalize removing this node
